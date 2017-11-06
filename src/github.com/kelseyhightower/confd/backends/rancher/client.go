@@ -120,9 +120,9 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 
 		if err == nil {
 			var jsonResponse interface{}
-			if err = json.Unmarshal(toReturn, &jsonResponse); err != nil {
+			if err = json.Unmarshal(toReturn, &jsonResponse); err == nil {
 				jsonFormatted, err := json.MarshalIndent(jsonResponse, "", "  ")
-				if err != nil {
+				if err == nil {
 					log.Debug(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
 				} else {
 					log.Debug(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), err.Error()))
