@@ -43,34 +43,34 @@ func NewRancherClient(backendNodes []string) (*Client, error) {
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := map[string]string{}
 
-    log.Info("-------------------\nGetValues:\n")
+    log.Debug("-------------------\nGetValues:\n")
 
 	for _, key := range keys {
 		body, err := c.makeMetaDataRequest(key)
 		if err != nil {
-			log.Info(fmt.Sprintf("makeMetaDataRequestError: %s\n", err.Error()))
+			log.Debug(fmt.Sprintf("makeMetaDataRequestError: %s\n", err.Error()))
 			return vars, err
 		}
 
 		var jsonResponse interface{}
 		if err = json.Unmarshal(body, &jsonResponse); err != nil {
-			log.Info(fmt.Sprintf("UnmarshalError: %s\n", err.Error()))
+			log.Debug(fmt.Sprintf("UnmarshalError: %s\n", err.Error()))
 			return vars, err
 		}
 
 		if err = treeWalk(key, jsonResponse, vars); err != nil {
-			log.Info(fmt.Sprintf("treeWalkError: %s\n", err.Error()))
+			log.Debug(fmt.Sprintf("treeWalkError: %s\n", err.Error()))
 			return vars, err
 		}
 	}
 
 	jsonFormatted, err := json.MarshalIndent(vars, "", "  ")
 	if err != nil {
-    log.Info(fmt.Sprintf("MarshalIndentError: \n%s\n", err.Error()))
+    log.Debug(fmt.Sprintf("MarshalIndentError: \n%s\n", err.Error()))
 	} else {
-		log.Info(fmt.Sprintf("VALUES: \n%s\n", jsonFormatted))
+		log.Debug(fmt.Sprintf("VALUES: \n%s\n", jsonFormatted))
 	}
-	log.Info("-------------------\n")
+	log.Debug("-------------------\n")
 
 	return vars, nil
 }
@@ -123,15 +123,15 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 			if err = json.Unmarshal(toReturn, &jsonResponse); err != nil {
 				jsonFormatted, err := json.MarshalIndent(jsonResponse, "", "  ")
 				if err != nil {
-					log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
+					log.Debug(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
 				} else {
-					log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), err.Error()))
+					log.Debug(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), err.Error()))
 				}
 			} else {
-				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, err.Error()))
+				log.Debug(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, err.Error()))
 			}
 		} else {
-			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nReadError: \n%s\n-------------------", c.url, path, err.Error()))
+			log.Debug(fmt.Sprintf("-------------------\nRancherURL: %s%s\nReadError: \n%s\n-------------------", c.url, path, err.Error()))
 		}
 
 	return toReturn, err
