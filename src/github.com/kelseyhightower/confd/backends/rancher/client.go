@@ -116,21 +116,25 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	  toReturn := ioutil.ReadAll(resp.Body)
+	  toReturn, err := ioutil.ReadAll(resp.Body)
 
-		var jsonResponse interface{}
-		if err = json.Unmarshal(toReturn, &jsonResponse); err != nil {
-			jsonFormatted, err := json.MarshalIndent(jsonResponse, "", "  ")
-			if err != nil {
-				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
+		if err != nil {
+			var jsonResponse interface{}
+			if err = json.Unmarshal(toReturn, &jsonResponse); err != nil {
+				jsonFormatted, err := json.MarshalIndent(jsonResponse, "", "  ")
+				if err != nil {
+					log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
+				} else {
+					log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), err.Error()))
+				}
 			} else {
-				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), err.Error()))
+				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, err.Error()))
 			}
 		} else {
-			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, err.Error()))
+			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nReadError: \n%s\n-------------------", c.url, path, err.Error()))
 		}
 
-	return toReturn
+	return toReturn, err
 }
 
 func (c *Client) testConnection() error {
