@@ -68,7 +68,7 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	if err != nil {
     log.Info(fmt.Sprintf("MarshalIndentError: \n%s\n", err.Error()))
 	} else {
-		log.Info(fmt.Sprintf("VALUES: \n%s\n", err.Error()))
+		log.Info(fmt.Sprintf("VALUES: \n%s\n", jsonFormatted))
 	}
 	log.Info("-------------------\n")
 
