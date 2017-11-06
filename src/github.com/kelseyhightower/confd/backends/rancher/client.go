@@ -42,21 +42,35 @@ func NewRancherClient(backendNodes []string) (*Client, error) {
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := map[string]string{}
 
+    log.Info("-------------------\nGetValues:\n")
+
 	for _, key := range keys {
 		body, err := c.makeMetaDataRequest(key)
 		if err != nil {
+			log.Info(fmt.Sprintf("makeMetaDataRequestError: %s\n", string(err)))
 			return vars, err
 		}
 
 		var jsonResponse interface{}
 		if err = json.Unmarshal(body, &jsonResponse); err != nil {
+			log.Info(fmt.Sprintf("UnmarshalError: %s\n", string(err)))
 			return vars, err
 		}
 
 		if err = treeWalk(key, jsonResponse, vars); err != nil {
+			log.Info(fmt.Sprintf("treeWalkError: %s\n", string(err)))
 			return vars, err
 		}
 	}
+
+	jsonFormatted, err := json.MarshalIndent(vars, "", "  ")
+	if err != nil {
+    log.Info(fmt.Sprintf("MarshalIndentError: \n%s\n", string(err)))
+	} else {
+		log.Info(fmt.Sprintf("VALUES: \n%s\n", string(err)))
+	}
+	log.Info("-------------------\n")
+
 	return vars, nil
 }
 
@@ -101,7 +115,21 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	return ioutil.ReadAll(resp.Body)
+	  toReturn := ioutil.ReadAll(resp.Body)
+
+		var jsonResponse interface{}
+		if err = json.Unmarshal(toReturn, &jsonResponse); err != nil {
+			jsonFormatted, err := json.MarshalIndent(jsonResponse, "", "  ")
+			if err != nil {
+				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
+			} else {
+				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), string(err)))
+			}
+		} else {
+			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, string(err)))
+		}
+		
+	return toReturn
 }
 
 func (c *Client) testConnection() error {
