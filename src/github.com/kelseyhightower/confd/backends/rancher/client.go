@@ -48,27 +48,27 @@ func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	for _, key := range keys {
 		body, err := c.makeMetaDataRequest(key)
 		if err != nil {
-			log.Info(fmt.Sprintf("makeMetaDataRequestError: %s\n", string(err)))
+			log.Info(fmt.Sprintf("makeMetaDataRequestError: %s\n", err.Error()))
 			return vars, err
 		}
 
 		var jsonResponse interface{}
 		if err = json.Unmarshal(body, &jsonResponse); err != nil {
-			log.Info(fmt.Sprintf("UnmarshalError: %s\n", string(err)))
+			log.Info(fmt.Sprintf("UnmarshalError: %s\n", err.Error()))
 			return vars, err
 		}
 
 		if err = treeWalk(key, jsonResponse, vars); err != nil {
-			log.Info(fmt.Sprintf("treeWalkError: %s\n", string(err)))
+			log.Info(fmt.Sprintf("treeWalkError: %s\n", err.Error()))
 			return vars, err
 		}
 	}
 
 	jsonFormatted, err := json.MarshalIndent(vars, "", "  ")
 	if err != nil {
-    log.Info(fmt.Sprintf("MarshalIndentError: \n%s\n", string(err)))
+    log.Info(fmt.Sprintf("MarshalIndentError: \n%s\n", err.Error()))
 	} else {
-		log.Info(fmt.Sprintf("VALUES: \n%s\n", string(err)))
+		log.Info(fmt.Sprintf("VALUES: \n%s\n", err.Error()))
 	}
 	log.Info("-------------------\n")
 
@@ -124,10 +124,10 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 			if err != nil {
 				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\n-------------------", c.url, path, string(jsonFormatted)))
 			} else {
-				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), string(err)))
+				log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nRancherResponseJSON:\n%s\nMarshalError: \n%s\n-------------------", c.url, path, string(toReturn), err.Error()))
 			}
 		} else {
-			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, string(err)))
+			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, err.Error()))
 		}
 
 	return toReturn
