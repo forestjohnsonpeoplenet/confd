@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"fmt"
 
 	log "github.com/kelseyhightower/confd/log"
 )
@@ -128,7 +129,7 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 		} else {
 			log.Info(fmt.Sprintf("-------------------\nRancherURL: %s%s\nUnmarshalError: \n%s\n-------------------", c.url, path, string(err)))
 		}
-		
+
 	return toReturn
 }
 
