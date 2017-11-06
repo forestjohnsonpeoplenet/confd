@@ -118,7 +118,7 @@ func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
 
 	  toReturn, err := ioutil.ReadAll(resp.Body)
 
-		if err != nil {
+		if err == nil {
 			var jsonResponse interface{}
 			if err = json.Unmarshal(toReturn, &jsonResponse); err != nil {
 				jsonFormatted, err := json.MarshalIndent(jsonResponse, "", "  ")
